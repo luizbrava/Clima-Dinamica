@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clima & Magia Dinâmica ✨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================================
+           1. VARIÁVEIS E TEMAS
+           ============================================================ */
+        :root {
+            --bg-color-1: #e0f2fe; 
+            --bg-color-2: #fdf2f8; 
+            --glass-bg: rgba(255, 255, 255, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --text-color: #334155;
+            --accent-color: #f472b6; 
+            --shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            --font-main: 'Poppins', sans-serif;
+            --font-title: 'Comfortaa', cursive;
+            --transition-speed: 0.8s; 
+        }
+
+        body.theme-sunny {
+            --bg-color-1: #fef3c7; 
+            --bg-color-2: #fffbeb; 
+            --glass-bg: rgba(255, 255, 255, 0.6);
+            --text-color: #92400e; 
+            --accent-color: #fbbf24; 
+            --shadow: 0 10px 40px rgba(251, 191, 36, 0.2);
+        }
+
+        body.theme-rainy {
+            --bg-color-1: #334155; 
+            --bg-color-2: #1e293b; 
+            --glass-bg: rgba(30, 41, 59, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-color: #f1f5f9; 
+            --accent-color: #38bdf8; 
+            --shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        body.theme-cloudy {
+            --bg-color-1: #e2e8f0; 
+            --bg-color-2: #cbd5e1; 
+            --glass-bg: rgba(255, 255, 255, 0.3);
+            --text-color: #475569; 
+            --accent-color: #94a3b8; 
+            --shadow: 0 10px 30px rgba(71, 85, 105, 0.1);
+        }
+
+        body.theme-snowy {
+            --bg-color-1: #ffffff; 
+            --bg-color-2: #e0f7fa; 
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --text-color: #01579b;
+            --accent-color: #81d4fa;
+            --shadow: 0 10px 40px rgba(129, 212, 250, 0.2);
+        }
+
+        /* ============================================================
+           2. ESTILOS GERAIS
+           ============================================================ */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-main);
+            background: linear-gradient(135deg, var(--bg-color-1), var(--bg-color-2));
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden; 
+            transition: background var(--transition-speed) ease;
+        }
+
+        #atmosphere {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; 
+            z-index: 0;
+        }
+
+        /* ============================================================
+           3. CARTÃO PRINCIPAL
+           ============================================================ */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 40px;
+            padding: 50px;
+            width: 400px;
+            max-width: 90%;
+            text-align: center;
+            box-shadow: var(--shadow);
+            z-index: 10; 
+            transition: transform 0.4s ease, box-shadow var(--transition-speed) ease, background var(--transition-speed) ease;
+        }
+
+        .glass-card:hover { transform: translateY(-5px); }
+
+        h1 {
+            font-family: var(--font-title);
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: var(--text-color);
+            transition: color var(--transition-speed) ease;
+        }
+
+        /* ============================================================
+           4. SELETOR DE CIDADES
+           ============================================================ */
+        .select-wrapper {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        select {
+            width: 100%;
+            padding: 16px 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(255, 255, 255, 0.7);
+            font-family: var(--font-main);
+            font-size: 1rem;
+            color: #333;
+            outline: none;
+            cursor: pointer;
+            appearance: none; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            transition: all 0.3s ease;
+        }
+
+        select:hover {
+            border-color: var(--accent-color);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .select-wrapper::after {
+            content: '▼';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8rem;
+            color: var(--accent-color);
+            pointer-events: none;
+        }
+
+        /* ============================================================
+           5. ÁREA DO JOGO
+           ============================================================ */
+        #game-area {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeInContainer 0.5s ease;
+        }
+
+        .game-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 5px;
+        }
+
+        .game-instruction {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-bottom: 15px;
+        }
+
+        #timer {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 15px;
+            font-family: var(--font-title);
+        }
+
+        #bubble-container {
+            width: 100%;
+            height: 250px;
+            background: rgba(0, 0, 0, 0.03);
+            border-radius: 25px;
+            position: relative;
+            overflow: hidden;
+            border: 2px dashed var(--accent-color);
+            cursor: crosshair;
+        }
+
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.1s ease, opacity 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            animation: bubbleFloat UP 4s linear; 
+        }
+
+        .bubble.target {
+            background: radial-gradient(circle at 30% 30%, #f472b6, #db2777);
+            border: 2px solid #fdf2f8;
+        }
+
+        .bubble.decoy {
+            background: radial-gradient(circle at 30% 30%, #e2e8f0, #94a3b8);
+            border: 2px solid #f8fafc;
+        }
+
+        .bubble:active { transform: scale(0.8); }
+
+        /* ============================================================
+           6. RESULTADO
+           ============================================================ */
+        #weather-result {
+            display: none;
+            animation: slideUpBounce 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .weather-icon-large {
+            font-size: 6rem;
+            margin: -10px 0;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.1));
+            animation: iconFloat 3s ease-in-out infinite;
+        }
+
+        .temp-big {
+            font-family: var(--font-title);
+            font-size: 4.5rem;
+            font-weight: 700;
+            margin: 5px 0;
+            color: var(--text-color);
+            line-height: 1;
+            transition: color var(--transition-speed) ease;
+        }
+
+        .condition-desc {
+            font-size: 1.3rem;
+            font-weight: 400;
+            text-transform: capitalize;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+        }
+
+        .city-name {
+            font-size: 1rem;
+            font-weight: 600;
+            background: var(--accent-color);
+            color: white;
+            padding: 8px 18px;
+            border-radius: 30px;
+            display: inline-block;
+        }
+
+        /* ============================================================
+           7. ANIMAÇÕES CSS
+           ============================================================ */
+        @keyframes fadeInContainer { from { opacity: 0; } to { opacity: 1; } }
+
+        @keyframes slideUpBounce {
+            from { opacity: 0; transform: translateY(50px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+
+        @keyframes bubbleFloat {
+            0% { transform: translateY(100%) scale(0.5); opacity: 0; }
+            10% { opacity: 1; transform: translateY(90%) scale(1); }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100%) scale(1); opacity: 0; }
+        }
+
+        .atm-element { position: absolute; pointer-events: none; opacity: 0.6; }
+        
+        .rain-drop {
+            width: 2px; height: 15px; background: var(--accent-color);
+            animation: rainFall 1s linear infinite;
+        }
+        @keyframes rainFall { to { transform: translateY(100vh); } }
+
+        .cloud-element {
+            font-size: 4rem; color: #fff;
+            animation: cloudDrift 20s linear infinite;
+        }
+        @keyframes cloudDrift {
+            from { left: -150px; }
+            to { left: 100%; }
+        }
+
+    </style>
+</head>
+<body class="theme-default">
+
+    <div id="atmosphere"></div>
+
+    <div class="glass-card">
+        <h1 id="main-title">Clima & Magia ✨</h1>
+        
+        <div class="select-wrapper">
+            <select id="city-select">
+                <option value="" disabled selected>✨ Escolha um destino...</option>
+                <option value="goiania">Goiânia, Brasil ☀️</option>
+                <option value="london">Londres, Inglaterra ☁️</option>
+                <option value="tokyo">Tóquio, Japão 🌧️</option>
+                <option value="newyork">Nova York, EUA ❄️</option>
+                <option value="salvador">Salvador, Brasil ☀️</option>
+                <option value="curitiba">Curitiba, Brasil 🌧️</option>
+                <option value="moscow">Moscou, Rússia ❄️</option>
+                <option value="cairo">Cairo, Egito ☀️</option>
+            </select>
+        </div>
+
+        <div id="game-area">
+            <div class="game-title">O Desafio do Vento!</div>
+            <div class="game-instruction">Estoure as bolhas <span style="color:#db2777; font-weight:bold;">ROSAS</span> rapidamente!</div>
+            <div id="timer">00:10</div>
+            <div id="bubble-container"></div>
+        </div>
+
+        <div id="weather-result">
+            <div class="weather-icon-large" id="w-icon">☀️</div>
+            <div class="temp-big" id="w-temp">--°C</div>
+            <div class="condition-desc" id="w-desc">--</div>
+            <div class="city-name" id="w-city">--</div>
+        </div>
+    </div>
+
+    <script>
+        // Banco de Dados Expandido!
+        const db = {
+            goiania: { city: 'Goiânia', temp: '32°C', desc: 'Sol e Calorão', icon: '☀️', theme: 'theme-sunny' },
+            london: { city: 'Londres', temp: '18°C', desc: 'Céu Nublado', icon: '☁️', theme: 'theme-cloudy' },
+            tokyo: { city: 'Tóquio', temp: '15°C', desc: 'Chuva Fina', icon: '🌧️', theme: 'theme-rainy' },
+            newyork: { city: 'Nova York', temp: '-2°C', desc: 'Nevasca', icon: '❄️', theme: 'theme-snowy' },
+            salvador: { city: 'Salvador', temp: '30°C', desc: 'Sol e Brisa', icon: '☀️', theme: 'theme-sunny' },
+            curitiba: { city: 'Curitiba', temp: '14°C', desc: 'Garoa Fria', icon: '🌧️', theme: 'theme-rainy' },
+            moscow: { city: 'Moscou', temp: '-10°C', desc: 'Neve Densa', icon: '❄️', theme: 'theme-snowy' },
+            cairo: { city: 'Cairo', temp: '38°C', desc: 'Sol Escaldante', icon: '☀️', theme: 'theme-sunny' }
+        };
+
+        const body = document.body;
+        const atmContainer = document.getElementById('atmosphere');
+        const citySelect = document.getElementById('city-select');
+        const gameArea = document.getElementById('game-area');
+        const weatherResult = document.getElementById('weather-result');
+        const bubbleContainer = document.getElementById('bubble-container');
+        const timerDisplay = document.getElementById('timer');
+        const mainTitle = document.getElementById('main-title');
+
+        let gameInterval;
+        let bubbleSpawnInterval;
+        let timeLeft = 10;
+        let score = 0;
+        const targetScore = 5; 
+        let selectedCityData = null;
+
+        citySelect.addEventListener('change', (e) => {
+            selectedCityData = db[e.target.value];
+            if (!selectedCityData) return;
+
+            weatherResult.style.display = 'none';
+            mainTitle.style.display = 'none'; 
+            limparAtmosfera(); 
+            startGame();
+        });
+
+        function startGame() {
+            gameArea.style.display = 'flex';
+            score = 0;
+            timeLeft = 10;
+            timerDisplay.textContent = `00:${timeLeft}`;
+            timerDisplay.style.color = 'var(--text-color)';
+            
+            gameInterval = setInterval(updateTimer, 1000);
+            bubbleSpawnInterval = setInterval(spawnBubble, 300);
+        }
+
+        function updateTimer() {
+            timeLeft--;
+            timerDisplay.textContent = `00:${timeLeft < 10 ? '0' + timeLeft : timeLeft}`;
+
+            if (timeLeft <= 3) timerDisplay.style.color = '#dc2626';
+
+            if (timeLeft <= 0) endGame(false);
+        }
+
+        function spawnBubble() {
+            const bubble = document.createElement('div');
+            bubble.classList.add('bubble');
+
+            const isTarget = Math.random() < 0.4;
+            if (isTarget) {
+                bubble.classList.add('target');
+            } else {
+                bubble.classList.add('decoy');
+            }
+
+            const size = Math.random() * 20 + 30 + 'px'; 
+            bubble.style.width = size;
+            bubble.style.height = size;
+            bubble.style.left = Math.random() * 80 + 10 + '%'; 
+            bubble.style.animationDuration = Math.random() * 2 + 3 + 's'; 
+
+            bubble.addEventListener('click', () => {
+                if (bubble.classList.contains('target')) {
+                    score++;
+                    createPoofEffect(bubble); 
+                    bubble.remove(); 
+                    
+                    if (score >= targetScore) endGame(true);
+                } else {
+                    createErrorEffect(bubble);
+                    timeLeft = Math.max(0, timeLeft - 1); 
+                    timerDisplay.textContent = `00:${timeLeft < 10 ? '0' + timeLeft : timeLeft}`;
+                    bubble.remove();
+                }
+            });
+
+            bubbleContainer.appendChild(bubble);
+            bubble.addEventListener('animationend', () => bubble.remove());
+        }
+
+        function endGame(win) {
+            clearInterval(gameInterval);
+            clearInterval(bubbleSpawnInterval);
+            bubbleContainer.innerHTML = ''; 
+
+            if (win) {
+                gameArea.style.display = 'none';
+                showWeather(selectedCityData);
+            } else {
+                timerDisplay.textContent = "😮 Ops! Tente de novo!";
+                timerDisplay.style.color = '#dc2626';
+                citySelect.value = ''; 
+                setTimeout(() => {
+                    gameArea.style.display = 'none';
+                    mainTitle.style.display = 'block'; 
+                }, 1500);
+            }
+        }
+
+        function showWeather(data) {
+            body.className = ''; 
+            body.classList.add(data.theme);
+
+            document.getElementById('w-icon').textContent = data.icon;
+            document.getElementById('w-temp').textContent = data.temp;
+            document.getElementById('w-desc').textContent = data.desc;
+            document.getElementById('w-city').textContent = data.city;
+
+            aplicarEfeitosAtmosfericos(data.theme);
+            weatherResult.style.display = 'block';
+        }
+
+        function limparAtmosfera() {
+            atmContainer.innerHTML = '';
+        }
+
+        function aplicarEfeitosAtmosfericos(theme) {
+            limparAtmosfera();
+
+            if (theme === 'theme-rainy') {
+                for (let i = 0; i < 60; i++) {
+                    const drop = document.createElement('div');
+                    drop.classList.add('atm-element', 'rain-drop');
+                    drop.style.left = Math.random() * 100 + 'vw';
+                    drop.style.animationDuration = Math.random() * 0.5 + 0.7 + 's'; 
+                    drop.style.animationDelay = Math.random() * 2 + 's';
+                    atmContainer.appendChild(drop);
+                }
+            } else if (theme === 'theme-cloudy' || theme === 'theme-sunny') {
+                const cloudEmojis = ['☁️', '🌤️', '☁️'];
+                for (let i = 0; i < 4; i++) {
+                    const cloud = document.createElement('div');
+                    cloud.classList.add('atm-element', 'cloud-element');
+                    cloud.textContent = cloudEmojis[Math.floor(Math.random()*cloudEmojis.length)];
+                    cloud.style.top = Math.random() * 50 + '%'; 
+                    cloud.style.animationDuration = Math.random() * 15 + 15 + 's'; 
+                    cloud.style.animationDelay = Math.random() * 10 + 's';
+                    cloud.style.opacity = Math.random() * 0.4 + 0.2;
+                    atmContainer.appendChild(cloud);
+                }
+            } else if (theme === 'theme-snowy') {
+                 for (let i = 0; i < 30; i++) {
+                    const flake = document.createElement('div');
+                    flake.classList.add('atm-element');
+                    flake.textContent = '❄️';
+                    flake.style.color = '#fff';
+                    flake.style.fontSize = Math.random() * 1 + 1 + 'rem';
+                    flake.style.left = Math.random() * 100 + 'vw';
+                    flake.style.top = '-50px';
+                    
+                    flake.animate([
+                        { transform: 'translateY(0) translateX(0)', opacity: 0 },
+                        { opacity: 1, offset: 0.1 },
+                        { transform: `translateY(110vh) translateX(${Math.random()*100 - 50}px)`, opacity: 0 }
+                    ], {
+                        duration: Math.random() * 3000 + 3000,
+                        iterations: Infinity,
+                        delay: Math.random() * 5000
+                    });
+                    atmContainer.appendChild(flake);
+                 }
+            }
+        }
+
+        function createPoofEffect(bubble) {
+            const poof = document.createElement('div');
+            poof.textContent = '💥';
+            poof.style.position = 'absolute';
+            poof.style.left = bubble.style.left;
+            poof.style.top = bubble.style.top;
+            poof.style.fontSize = bubble.style.width;
+            poof.style.pointerEvents = 'none';
+            poof.style.animation = 'fadeInContainer 0.3s ease reverse forwards';
+            bubbleContainer.appendChild(poof);
+            setTimeout(() => poof.remove(), 300);
+        }
+
+        function createErrorEffect(bubble) {
+             bubbleContainer.style.borderColor = '#dc2626'; 
+             setTimeout(() => bubbleContainer.style.borderColor = 'var(--accent-color)', 200);
+        }
+
+    </script>
+</body>
+</html>
